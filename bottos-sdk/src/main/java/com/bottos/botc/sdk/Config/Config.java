@@ -5,7 +5,7 @@ package com.bottos.botc.sdk.Config;
  */
 public class Config {
 
-    public static String BASE_NET_URL = "http://192.168.2.119:8689/v1/";
+    public static String BASE_NET_URL = "http://192.168.2.178:8689/v1/";
 
     public static boolean DEBUG_MODE = true;
 

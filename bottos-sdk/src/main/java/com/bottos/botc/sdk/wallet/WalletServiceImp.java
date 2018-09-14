@@ -12,6 +12,7 @@ import com.bottos.botc.sdk.net.request.RequestDataSign;
 import com.bottos.botc.sdk.net.request.SendTransactionParamsRequest;
 import com.bottos.botc.sdk.utils.KeystoreKeyCreatTool;
 import com.bottos.botc.sdk.utils.Strings;
+import com.bottos.botc.sdk.utils.crypto.CryptTool;
 
 /**
  * Created by xionglh on 2018/9/5
@@ -50,7 +51,10 @@ public class WalletServiceImp implements WalletService {
             public void onNext(BlockHeight blockHeight) {
                 RequestDataSign sendTransactionRequest = new RequestDataSign();
                 sendTransactionRequest.setVersion(1);
-                sendTransactionRequest.setCursor_lab(blockHeight.getCursor_label());
+                sendTransactionRequest.setCursor_label(blockHeight.getCursor_label());
+                sendTransactionRequest.setCursor_num(blockHeight.getHead_block_num());
+                sendTransactionRequest.setLifetime(blockHeight.getHead_block_time() + 30);
+                sendTransactionRequest.setCursor_label(blockHeight.getCursor_label());
                 sendTransactionRequest.setCursor_num(blockHeight.getHead_block_num());
                 sendTransactionRequest.setLifetime(blockHeight.getHead_block_time() + 30);
                 sendTransactionRequest.setSender(Constants.CREATE_ACCOUNT_SEND);
@@ -61,8 +65,8 @@ public class WalletServiceImp implements WalletService {
                 param.setName(name);
                 param.setPubkey(publicKey);
                 long[] params = CreateAccountParamsRequest.getPackParam(param);
-                sendTransactionRequest.setParam(params);
-                RequestDataSign.getSignaturedFetchParam(sendTransactionRequest, privateKey, blockHeight.getChain_id());
+                sendTransactionRequest.setParam(CryptTool.getHex16(params));
+                RequestDataSign.getSignaturedFetchParam(sendTransactionRequest, params,privateKey, blockHeight.getChain_id());
                 BotcManger.getInstance().getApiWrapper().sendTransaction(sendTransactionRequest, requestCallBackImp);
             }
         });
@@ -79,7 +83,7 @@ public class WalletServiceImp implements WalletService {
             public void onNext(BlockHeight blockHeight) {
                 RequestDataSign sendTransactionRequest = new RequestDataSign();
                 sendTransactionRequest.setVersion(1);
-                sendTransactionRequest.setCursor_lab(blockHeight.getCursor_label());
+                sendTransactionRequest.setCursor_label(blockHeight.getCursor_label());
                 sendTransactionRequest.setCursor_num(blockHeight.getHead_block_num());
                 sendTransactionRequest.setLifetime(blockHeight.getHead_block_time() + 30);
                 sendTransactionRequest.setSender(fromUser);
@@ -91,8 +95,8 @@ public class WalletServiceImp implements WalletService {
                 param.setFrom(fromUser);
                 param.setPrice(price);
                 long[] params = SendTransactionParamsRequest.getPackParam(param);
-                sendTransactionRequest.setParam(params);
-                RequestDataSign.getSignaturedFetchParam(sendTransactionRequest, privateKey, blockHeight.getChain_id());
+                sendTransactionRequest.setParam(CryptTool.getHex16(params));
+                RequestDataSign.getSignaturedFetchParam(sendTransactionRequest,params, privateKey, blockHeight.getChain_id());
                 BotcManger.getInstance().getApiWrapper().sendTransaction(sendTransactionRequest, requestCallBackImp);
             }
         });

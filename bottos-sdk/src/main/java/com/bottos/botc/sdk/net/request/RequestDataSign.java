@@ -8,13 +8,13 @@ import com.bottos.botc.sdk.utils.msgpack.MsgPack;
 /**
  * Created by xionglh on 2018/9/5
  */
-public class RequestDataSign extends BaseRequest {
+public class RequestDataSign extends BaseParamsRequest {
 
     private int version = 1;
 
     private long cursor_num;
 
-    private long cursor_lab;
+    private long cursor_label;
 
     private long lifetime;
 
@@ -24,7 +24,7 @@ public class RequestDataSign extends BaseRequest {
 
     private String method;
 
-    private long [] param;
+    private String param;
 
     private long sig_alg;
 
@@ -56,12 +56,12 @@ public class RequestDataSign extends BaseRequest {
         this.cursor_num = cursor_num;
     }
 
-    public long getCursor_lab() {
-        return cursor_lab;
+    public long getCursor_label() {
+        return cursor_label;
     }
 
-    public void setCursor_lab(long cursor_lab) {
-        this.cursor_lab = cursor_lab;
+    public void setCursor_label(long cursor_label) {
+        this.cursor_label = cursor_label;
     }
 
     public long getLifetime() {
@@ -96,11 +96,11 @@ public class RequestDataSign extends BaseRequest {
         this.method = method;
     }
 
-    public long[] getParam() {
+    public String getParam() {
         return param;
     }
 
-    public void setParam(long[] param) {
+    public void setParam(String param) {
         this.param = param;
     }
 
@@ -113,16 +113,16 @@ public class RequestDataSign extends BaseRequest {
     }
 
 
-    public static long[] messageProtoEncode(RequestDataSign sendTransactionRequest) {
+    public static long[] messageProtoEncode(RequestDataSign sendTransactionRequest,long []param) {
         long[] pArraySize = MsgPack.packArraySize(9);
         long[] pVersion = MsgPack.packUint32(sendTransactionRequest.getVersion());
         long[] pCursorNum = MsgPack.packUint64(sendTransactionRequest.getCursor_num());
-        long[] pCursorLabel = MsgPack.packUint32(sendTransactionRequest.getCursor_lab());
+        long[] pCursorLabel = MsgPack.packUint32(sendTransactionRequest.getCursor_label());
         long[] pLifeTime = MsgPack.packUint64(sendTransactionRequest.getLifetime());
         long[] pSender = MsgPack.packStr16(sendTransactionRequest.getSender());
         long[] pContract = MsgPack.packStr16(sendTransactionRequest.getContract());
         long[] pMethod = MsgPack.packStr16(sendTransactionRequest.getMethod());
-        long[] pParam = MsgPack.packBin16(sendTransactionRequest.getParam());
+        long[] pParam = MsgPack.packBin16(param);
         long[] uint8Param = new long[pParam.length];
         for (int i = 0; i < pParam.length; i++) {
             uint8Param[i] = MsgPack.Uint8Array(pParam[i]);
@@ -131,8 +131,8 @@ public class RequestDataSign extends BaseRequest {
         return ArraysUtils.arrayCopylong(pArraySize, pVersion, pCursorNum, pCursorLabel, pLifeTime, pSender, pContract, pMethod, uint8Param, pSigalg);
     }
 
-    public static void getSignaturedFetchParam(RequestDataSign sendTransactionRequest, String privateKeyStr, String chain) {
-        long[] encodeBuf1 = messageProtoEncode(sendTransactionRequest);
+    public static void getSignaturedFetchParam(RequestDataSign sendTransactionRequest,long []params, String privateKeyStr, String chain) {
+        long[] encodeBuf1 = messageProtoEncode(sendTransactionRequest,params);
         byte[] ss = Numeric.hexStringToByteArray(chain);
         long[] encodeBuf2 = new long[ss.length];
         for (int i = 0; i < ss.length; i++) {
